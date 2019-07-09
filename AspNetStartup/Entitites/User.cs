@@ -62,10 +62,16 @@ namespace Everest.AspNetStartup.Entities
 
         public string Website { get; set; }
 
-        [JsonIgnore]
+        [Newtonsoft.Json.JsonIgnore]
         public virtual IList<Connection> Connections { get; set; }
 
-        [JsonIgnore]
+        [Newtonsoft.Json.JsonIgnore]
         public virtual List<UserRole> UserRoles { get; set; }
+
+
+        public Boolean HasRole(string role)
+        {
+            return UserRoles.ConvertAll(ur => ur.Role.Name).Contains(role);
+        }
     }
 }

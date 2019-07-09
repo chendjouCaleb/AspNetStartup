@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.IO;
 
 namespace Everest.IdentityTest
 {
@@ -33,6 +34,11 @@ namespace Everest.IdentityTest
             ServiceCollection.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
             ServiceCollection.AddTransient<AccessTokenValidator>();
             ServiceCollection.AddSingleton<IConfiguration, TestConfiguration>();
+
+            if (!Directory.Exists(Constant.USER_IMAGE_FOLDER))
+            {
+                Directory.CreateDirectory(Constant.USER_IMAGE_FOLDER);
+            }
 
 
             return ServiceCollection;

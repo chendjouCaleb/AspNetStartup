@@ -13,7 +13,7 @@ namespace Everest.Identity.Filters
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            User authuser = context.HttpContext.Items["Authorization.user"] as User;
+            User authuser = context.HttpContext.Items["Authorization.User"] as User;
             User user = context.HttpContext.Items["user"] as User;
             System.Console.WriteLine($"user Id = {user.Id}");
             System.Console.WriteLine($"Auth ccount Id = {authuser.Id}");

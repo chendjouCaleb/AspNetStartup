@@ -31,5 +31,10 @@ namespace Everest.AspNetStartup.Entities
 
         public string RefreshToken { get; set; }
 
+        public void Close()
+        {
+            EndDate = DateTime.Now;
+        }
+
     }
 }

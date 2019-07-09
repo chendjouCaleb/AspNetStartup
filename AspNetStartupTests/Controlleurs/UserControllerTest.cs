@@ -12,6 +12,7 @@ using Everest.AspNetStartup.Core.Persistence;
 using Everest.AspNetStartup.Core.Binding;
 using Everest.AspNetStartup.Core;
 using Everest.AspNetStartup.Models;
+using Everest.AspNetStartup;
 
 namespace Everest.IdentityTest.Controlleurs
 {
@@ -20,7 +21,7 @@ namespace Everest.IdentityTest.Controlleurs
         private UserController controller;
         private IRepository<User, string> accountRepository;
         private IPasswordHasher<User> passwordHasher;
-        private AdduserModel model;
+        private AddUserModel model;
 
         [SetUp]
         public void BeforeEach()
@@ -33,7 +34,7 @@ namespace Everest.IdentityTest.Controlleurs
             accountRepository = serviceProvider.GetRequiredService<IRepository<User, string>>();
             passwordHasher = serviceProvider.GetRequiredService<IPasswordHasher<User>>();
 
-            model = new AdduserModel
+            model = new AddUserModel
             {
                 Email = "chendjou@email.com",
                 Name = "caleb",
@@ -311,7 +312,7 @@ namespace Everest.IdentityTest.Controlleurs
 
         public async Task ChangeImageAsync()
         {
-            User account = controller.Create(model);
+            User user = controller.Create(model);
             FileStream image = File.Open("E:/Lab/static/TestImage/heic0515a.jpg", FileMode.Open);
             
 
@@ -322,9 +323,11 @@ namespace Everest.IdentityTest.Controlleurs
             };
             formImage.ContentType = "image/jpeg";
 
-            await controller.ChangeImage(account, formImage);
+            await controller.ChangeImage(user, formImage);
 
-            Assert.AreEqual(account.Id + ".jpg", account.ImageName);
+            Assert.AreEqual(user.Id + ".jpg", user.ImageName);
+            Assert.True(File.Exists(Path.Combine(Constant.USER_IMAGE_FOLDER,user.ImageName)));
+            File.Delete(Path.Combine(Constant.USER_IMAGE_FOLDER, user.ImageName));
         }
     }
 

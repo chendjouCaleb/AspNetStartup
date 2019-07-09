@@ -29,11 +29,12 @@ namespace Everest.AspNetStartup.Controllers
         private IConfiguration configuration;
 
         public ConnectionController(IRepository<Connection, long> connectionRepository, IRepository<User, string> userRepository, 
-            IPasswordHasher<User> passwordHasher)
+            IPasswordHasher<User> passwordHasher, IConfiguration configuration)
         {
             this.connectionRepository = connectionRepository;
             this.userRepository = userRepository;
             this.passwordHasher = passwordHasher;
+            this.configuration = configuration;
         }
 
         [HttpGet("{connectionId}")]
@@ -94,6 +95,8 @@ namespace Everest.AspNetStartup.Controllers
                 BeginDate = DateTime.Now,
             };
 
+            connectionRepository.Save(connection);
+
             Claim[] claims = new Claim[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
@@ -117,7 +120,9 @@ namespace Everest.AspNetStartup.Controllers
 
             var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
-            connectionRepository.Save(connection);
+            connection.AccessToken = accessToken;
+
+            connectionRepository.Update(connection);
 
             return connection;
         }

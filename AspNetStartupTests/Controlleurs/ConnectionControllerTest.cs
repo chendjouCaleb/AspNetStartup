@@ -7,11 +7,18 @@ using Everest.AspNetStartup.Core.Persistence;
 using Everest.AspNetStartup.Entities;
 using Everest.AspNetStartup.Core;
 using Everest.AspNetStartup.Models;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.Extensions.Configuration;
+using System.Security.Claims;
+using Everest.Core.Identity;
 
 namespace Everest.IdentityTest.Controlleurs
 {
     public class ConnectionControllerTest
     {
+        private IConfiguration Configuration;
         private ConnectionController controller;
         private IRepository<Connection, long> connectionRepository;
         private IRepository<User, string> accountRepository;
@@ -24,6 +31,8 @@ namespace Everest.IdentityTest.Controlleurs
             IServiceCollection serviceCollection = ServiceConfiguration.InitServiceCollection();
             IServiceProvider serviceProvider = ServiceConfiguration.BuildServiceProvider();
 
+            Configuration = serviceProvider.GetRequiredService<IConfiguration>();
+
 
             controller = serviceProvider.GetRequiredService<ConnectionController>();
             accountRepository = serviceProvider.GetRequiredService<IRepository<User, string>>();
@@ -32,6 +41,7 @@ namespace Everest.IdentityTest.Controlleurs
 
             account = new User
             {
+                Username = "username",
                 Email = "account@email.com"
             };
             account.Password = passwordHasher.HashPassword(account, "password123");
@@ -64,6 +74,8 @@ namespace Everest.IdentityTest.Controlleurs
             Assert.NotNull(connection.BeginDate);
             Assert.Null(connection.EndDate);
             Assert.False(connection.IsClosed);
+
+            ValidateAccessToken(connection);
         }
 
         [Test]
@@ -101,6 +113,32 @@ namespace Everest.IdentityTest.Controlleurs
             controller.Logout(connection);
 
             Assert.Throws<InvalidOperationException>(() => controller.Logout(connection));
+        }
+
+        private void ValidateAccessToken(Connection connection)
+        {
+            var handler = new JwtSecurityTokenHandler();
+
+            TokenValidationParameters parameters = new TokenValidationParameters();
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["authorization:secretKey"]));
+
+
+            parameters = new TokenValidationParameters
+            {
+                IssuerSigningKey = secretKey,
+                ValidAudience = Configuration["authorization:validAudience"],
+                ValidIssuer = Configuration["authorization:validIssuer"],
+                RequireExpirationTime = true,
+                RequireSignedTokens = true
+            };
+
+            ClaimsPrincipal claims = handler.ValidateToken(connection.AccessToken, parameters, out var _);
+
+            Assert.AreEqual(account.Id.ToString(), claims.FindFirstValue(ClaimTypes.NameIdentifier));
+            Assert.AreEqual(account.Email, claims.FindFirstValue(ClaimTypes.Email));
+            Assert.AreEqual(connection.Id.ToString(), claims.FindFirstValue(EverestClaims.ConnectionId));
+
+            
         }
     }
 }

@@ -20,7 +20,7 @@ namespace Everest.Identity.Filters
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            AuthorizationResult result = context.HttpContext.Items["Authorization.Result"] 
+            AuthorizationResult result = context.HttpContext.Items["Authorization"] 
                 as AuthorizationResult;
 
             if (!result.Successed)

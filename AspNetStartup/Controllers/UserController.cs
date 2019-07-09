@@ -79,7 +79,7 @@ namespace Everest.AspNetStartup.Controllers
         ///
         [ValidModel]
         [HttpPost]
-        public User Create([FromBody] AdduserModel model)
+        public User Create([FromBody] AddUserModel model)
         {
 
             if(userRepository.Exists(a => a.Email == model.Email))
@@ -347,7 +347,7 @@ namespace Everest.AspNetStartup.Controllers
         [HttpPut("{userId}/image")]
         public async Task<StatusCodeResult> ChangeImage(User user, IFormFile image)
         {
-            string fileName = $"{user.Id.ToString()}.{image.Name.Split('.').Last()}";
+            string fileName = user.Id.ToString() + Path.GetExtension(image.Name);
             string path = Path.Combine(Constant.USER_IMAGE_FOLDER, fileName);
 
             using (var stream = new FileStream(path, FileMode.Create))

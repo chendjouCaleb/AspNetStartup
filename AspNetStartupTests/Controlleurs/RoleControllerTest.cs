@@ -32,7 +32,7 @@ namespace Everest.AspNetStartupTests.Controlleurs
             roleRepository = serviceProvider.GetRequiredService<IRepository<Role, string>>();
             userRoleRepository = serviceProvider.GetRequiredService<IRepository<UserRole, long>>();
 
-            var model = new AdduserModel
+            var model = new AddUserModel
             {
                 Email = "chendjou@email.com",
                 Name = "caleb",

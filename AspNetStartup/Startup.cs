@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.IO;
 
 namespace AspNetStartup
 {
@@ -62,6 +63,10 @@ namespace AspNetStartup
 
             var userSeed = app.ApplicationServices.GetRequiredService<UserSeedData>();
             userSeed.Seed();
+
+            if(!Directory.Exists(Constant.USER_IMAGE_FOLDER)){
+                Directory.CreateDirectory(Constant.USER_IMAGE_FOLDER);
+            }
 
 
             if (env.IsDevelopment())

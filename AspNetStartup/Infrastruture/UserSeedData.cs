@@ -24,7 +24,7 @@ namespace Everest.AspNetStartup.Infrastruture
                 return;
             }
             Role admin = roleRepository.First(r => r.Name == "ADMIN");
-            AdduserModel model = new AdduserModel
+            AddUserModel model = new AddUserModel
             {
                 Email = "chendjou2016@outlook.fr",
                 Name = "Chendjou",

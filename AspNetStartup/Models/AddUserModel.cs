@@ -3,22 +3,22 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Everest.AspNetStartup.Models
 {
-    public class AdduserModel
+    public class AddUserModel
     {
         [Required]
         [MinLength(length: 3)]
-        public String Name { get; set; }
+        public string Name { get; set; }
 
         [Required]
         [MinLength(length: 3)]
-        public String Surname { get; set; }
+        public string Surname { get; set; }
 
         [EmailAddress]
         [Required]
-        public String Email { get; set; }
+        public string Email { get; set; }
 
         [Required]
         [MinLength(6)]
-        public String Password { get; set; }
+        public string Password { get; set; }
     }
 }
