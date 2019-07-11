@@ -20,6 +20,10 @@ namespace Everest.AspNetStartup.Filters
             IRepository<User, string> repository =
                 context.HttpContext.RequestServices.GetRequiredService<IRepository<User, string>>();
             string id = context.GetParameter("userId");
+            if (string.IsNullOrEmpty(id))
+            {
+                return;
+            }
 
             User user = repository.Find(id);
 

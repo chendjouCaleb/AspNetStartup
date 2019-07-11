@@ -1,4 +1,3 @@
-using Everest.AspNetStartup;
 using Everest.AspNetStartup.Core.ExceptionTransformers;
 using Everest.AspNetStartup.Infrastruture;
 using Everest.AspNetStartup.Entities;
@@ -10,8 +9,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.IO;
+using Everest.AspNetStartup.Filters;
 
-namespace AspNetStartup
+namespace Everest.AspNetStartup
 {
     public class Startup
     {
@@ -25,7 +25,11 @@ namespace AspNetStartup
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+    
+            services.AddMvc(options => {
+                options.EnableEndpointRouting = false;
+            });
+            
 
             services.AddDbContext<DbContext, PersistenceContext>(options =>
             {
@@ -68,17 +72,10 @@ namespace AspNetStartup
                 Directory.CreateDirectory(Constant.USER_IMAGE_FOLDER);
             }
 
-
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
+            app.UseAccessTokenAuthorization();
             app.UseExceptionTransformer();
 
             app.UseCors("corsPolicy");
-
-            app.UseRouting();
 
             app.UseMvc();
         }

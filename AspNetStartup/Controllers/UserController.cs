@@ -46,12 +46,12 @@ namespace Everest.AspNetStartup.Controllers
         {
             if(username != null)
             {
-                return userRepository.First(a => a.Username == username);
+                return userRepository.First(a => a.Username.ToLower() == username.ToLower());
             }
 
             if (email != null)
             {
-                return userRepository.First(a => a.Email == email);
+                return userRepository.First(a => a.Email.ToLower() == email.ToLower());
             }
 
             if (phoneNumber != null)
@@ -139,7 +139,7 @@ namespace Everest.AspNetStartup.Controllers
             user.Email = email;
             userRepository.Update(user);
 
-            return StatusCode(201);
+            return StatusCode(StatusCodes.Status200OK);
         }
 
         /// <summary>
@@ -154,6 +154,7 @@ namespace Everest.AspNetStartup.Controllers
         /// est déjà utilisé par un autre compte.</exception>
 
         [Authorize]
+        [LoadUser]
         [RequireuserOwner]
         [HttpPut("{userId}/phoneNumber")]
         public StatusCodeResult UpdatePhoneNumber(User user, [FromQuery] string phoneNumber)
@@ -166,7 +167,7 @@ namespace Everest.AspNetStartup.Controllers
             user.PhoneNumber = phoneNumber;
             userRepository.Update(user);
 
-            return StatusCode(201);
+            return StatusCode(StatusCodes.Status200OK);
         }
 
         /// <summary>

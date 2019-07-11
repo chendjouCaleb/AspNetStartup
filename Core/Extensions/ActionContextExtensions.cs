@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Everest.AspNetStartup.Core.Extensions
 {
@@ -8,12 +9,15 @@ namespace Everest.AspNetStartup.Core.Extensions
         {
             string parameter = actionContext.RouteData.Values[name] as string;
 
+            HttpRequest request = actionContext.HttpContext.Request;
             if (parameter == null)
             {
-                parameter = actionContext.HttpContext.Request.Query[name];
+                parameter = request.Query[name];
             }
 
-            if(parameter == null)
+            if(parameter == null && !string.IsNullOrEmpty(request.ContentType) &&
+                (request.ContentType.StartsWith("application/x-www-form-urlencoded")
+                || request.ContentType.StartsWith("application/form-data")))
             {
                 parameter = actionContext.HttpContext.Request.Form[name];
             }

@@ -9,6 +9,7 @@ namespace Everest.AspNetStartup.Core.Binding
         {
             string name = bindingContext.FieldName;
 
+
             object value = bindingContext.HttpContext.Items[name];
 
             bindingContext.Result = ModelBindingResult.Success(value);

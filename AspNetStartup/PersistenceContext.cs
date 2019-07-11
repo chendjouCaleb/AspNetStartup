@@ -17,5 +17,15 @@ namespace Everest.AspNetStartup
         {
 
         }
+
+        public PersistenceContext()
+        {
+
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+        }
     }
 }

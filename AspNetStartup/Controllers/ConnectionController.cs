@@ -41,6 +41,12 @@ namespace Everest.AspNetStartup.Controllers
         [LoadConnection]
         public Connection Find(Connection connection) => connection;
 
+        [HttpGet("loggedUser")]
+        public User GetLoggedIn()
+        {
+            return HttpContext.Items["Authorization.User"] as User;
+        }
+
         /// <summary>
         /// Pour obtenir toutes les connexions d'un compte.
         /// </summary>
@@ -50,7 +56,11 @@ namespace Everest.AspNetStartup.Controllers
         [LoadUser]
         public IList<Connection> List(User user)
         {
-            return connectionRepository.List(c => c.User.Equals(user));
+            if(user != null)
+            {
+                return connectionRepository.List(c => c.User.Equals(user));
+            }
+            return connectionRepository.List();
         }
 
 

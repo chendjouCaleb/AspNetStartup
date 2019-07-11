@@ -63,9 +63,11 @@ namespace Everest.AspNetStartup.Entities
         public string Website { get; set; }
 
         [Newtonsoft.Json.JsonIgnore]
+        [JsonIgnore]
         public virtual IList<Connection> Connections { get; set; }
 
         [Newtonsoft.Json.JsonIgnore]
+        [JsonIgnore]
         public virtual List<UserRole> UserRoles { get; set; }
 
 

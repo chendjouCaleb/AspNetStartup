@@ -16,7 +16,15 @@ namespace Everest.AspNetStartup.Infrastruture
         private UserController userController;
         private RoleController roleController;
 
-
+        public UserSeedData(IRepository<User, string> userRepository, 
+            IRepository<Role, string> roleRepository, 
+            UserController userController, RoleController roleController)
+        {
+            this.userRepository = userRepository;
+            this.roleRepository = roleRepository;
+            this.userController = userController;
+            this.roleController = roleController;
+        }
 
         public void Seed()
         {
