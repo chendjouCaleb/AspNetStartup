@@ -13,6 +13,8 @@ using Everest.AspNetStartup.Entities;
 using Everest.AspNetStartup.Filters;
 using Everest.AspNetStartup.Core;
 using Everest.AspNetStartup.Models;
+using System.Net.Mime;
+using Everest.AspNetStartup.Core.Infrastructure;
 
 namespace Everest.AspNetStartup.Controllers
 {
@@ -21,7 +23,7 @@ namespace Everest.AspNetStartup.Controllers
     /// <see cref="User"/>
     /// </summary>
     [Route("api/users")]
-    public class UserController:Controller
+    public class UserController : Controller
     {
         public IRepository<User, string> userRepository { get; set; }
         private IPasswordHasher<User> passwordHasher;
@@ -44,7 +46,7 @@ namespace Everest.AspNetStartup.Controllers
         [HttpGet("find")]
         public User Find([FromQuery]string username, [FromQuery]string email, [FromQuery]string phoneNumber)
         {
-            if(username != null)
+            if (username != null)
             {
                 return userRepository.First(a => a.Username.ToLower() == username.ToLower());
             }
@@ -65,9 +67,9 @@ namespace Everest.AspNetStartup.Controllers
 
         [HttpGet]
         public IList<User> List() => userRepository.List();
-            
-        
-        
+
+
+
 
         /// <summary>
         /// Permet de créer un compte utilisateur.
@@ -82,7 +84,7 @@ namespace Everest.AspNetStartup.Controllers
         public User Create([FromBody] AddUserModel model)
         {
 
-            if(userRepository.Exists(a => a.Email == model.Email))
+            if (userRepository.Exists(a => a.Email == model.Email))
             {
                 ModelState.ThrowModelError("email", "Cet adresse électronique est déjà utilisée");
             }
@@ -105,7 +107,7 @@ namespace Everest.AspNetStartup.Controllers
             {
                 user.Username = username + usernameUsage;
             }
-            
+
             string password = passwordHasher.HashPassword(user, model.Password);
 
             user.Password = password;
@@ -182,11 +184,12 @@ namespace Everest.AspNetStartup.Controllers
         /// est déjà utilisé par un autre compte.</exception>
 
         [Authorize]
+        [LoadUser]
         [RequireuserOwner]
         [HttpPut("{userId}/username")]
         public StatusCodeResult UpdateUsername(User user, [FromQuery] string username)
         {
-            if(userRepository.Exists(a => a.Username == username))
+            if (userRepository.Exists(a => a.Username == username))
             {
                 throw new InvalidValueException("Ce nom d'utilisateur est déjà utilisée");
             }
@@ -204,6 +207,7 @@ namespace Everest.AspNetStartup.Controllers
         /// <param name="info">Les nouvelles informations du compte.</param>
         /// <returns>Le compte avec ses nouvelles informations.</returns>
         [Authorize]
+        [LoadUser]
         [RequireuserOwner]
         [HttpPut("{userId}/info")]
         public User UpdateInfo(User user, [FromBody] UserInfo info)
@@ -227,6 +231,7 @@ namespace Everest.AspNetStartup.Controllers
         /// <param name="address">Les informations sur na nouvelle adresse du compte.</param>
         /// <returns>Le compte avec ses nouvelles informations d'adresse.</returns>
         [Authorize]
+        [LoadUser]
         [RequireuserOwner]
         [HttpPut("{userId}/address")]
         public User UpdateAddress(User user, [FromBody] Address address)
@@ -250,11 +255,12 @@ namespace Everest.AspNetStartup.Controllers
         /// <returns>Un <see>StatusCodeResult</see> de code 201 indiquant que le mot de passe 
         /// a été modifié.</returns>
         [Authorize]
+        [LoadUser]
         [RequireuserOwner]
         [HttpPut("{userId}/password")]
         public StatusCodeResult ChangePassword(User user, UpdatePasswordModel model)
         {
-            if(PasswordVerificationResult.Success !=
+            if (PasswordVerificationResult.Success !=
                 passwordHasher.VerifyHashedPassword(user, user.Password, model.CurrentPassword))
             {
                 throw new InvalidValueException("Votre mot de passe actuel est incorrect");
@@ -286,12 +292,12 @@ namespace Everest.AspNetStartup.Controllers
         [HttpPut("{userId}/password/reset")]
         public StatusCodeResult ResetPassword(User user, ResetPasswordModel model)
         {
-            if(model.Code != user.ResetPasswordCode)
+            if (model.Code != user.ResetPasswordCode)
             {
                 throw new InvalidValueException("Le code de réinitialisation de mot de passe est incorrect");
             }
 
-            if(DateTime.Now.Subtract(user.ResetPasswordCodeCreateTime).TotalMinutes > 9.99)
+            if (DateTime.Now.Subtract(user.ResetPasswordCodeCreateTime).TotalMinutes > 9.99)
             {
                 throw new InvalidOperationException("Le code de réinitialisation de mot de passe est expirée");
             }
@@ -315,7 +321,7 @@ namespace Everest.AspNetStartup.Controllers
         ///     <code>true</code> Si le mot de passe est bien celui du compte.
         /// </returns>
         /// 
-        
+
         [LoadUser]
         [HttpPut("{userId}/password/check")]
         public bool CheckPassword(User user, [FromForm] string password)
@@ -329,10 +335,21 @@ namespace Everest.AspNetStartup.Controllers
         /// </summary>
         /// <param name="user">Le compte dont on souhaite obtenir l'image.</param>
         /// <returns>Le fichier qui est l'image du compte.</returns>
+        [LoadUser]
         [HttpGet("{userId}/image")]
         public async Task<IActionResult> DownloadImage(User user)
         {
-            return null;
+            string path = Path.Combine(Constant.USER_IMAGE_FOLDER, user.ImageName);
+            Stream memory = new MemoryStream();
+
+            using(var stream = new FileStream(path, FileMode.Open))
+            {
+                await stream.CopyToAsync(memory);
+            }
+
+            memory.Position = 0;
+            string mime = MimeTypes.GetMimeType(Path.GetExtension(path));
+            return File(memory, mime, user.ImageName);
         }
 
 
@@ -362,5 +379,5 @@ namespace Everest.AspNetStartup.Controllers
         }
     }
 
-    
+
 }

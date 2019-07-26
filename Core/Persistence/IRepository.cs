@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Everest.AspNetStartup.Core.Persistence
 {
     public interface IRepository<T, I> 
     {
+        IQueryable<T> Set { get; }
         T Find(I id);
         T First(Func<T, bool> predicate);
 

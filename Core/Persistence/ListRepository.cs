@@ -10,6 +10,8 @@ namespace Everest.AspNetStartup.Core.Persistence
         
         private List<T> Collections { get; set; }
 
+        public IQueryable<T> Set => Collections.AsQueryable();
+
         public ListRepository()
         {
             Collections = new List<T>();

@@ -9,6 +9,9 @@ namespace Everest.AspNetStartup.Core.Persistence
     public class Repository<T, TID> : IRepository<T, TID> where T : class
     {
         public DbSet<T> Collections { get; set; }
+
+        public IQueryable<T> Set => Collections;
+
         protected DbContext context;
 
         public Repository(DbContext dataContext)

@@ -10,6 +10,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.IO;
 using Everest.AspNetStartup.Filters;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System;
 
 namespace Everest.AspNetStartup
 {
@@ -80,4 +82,6 @@ namespace Everest.AspNetStartup
             app.UseMvc();
         }
     }
+
+    
 }
